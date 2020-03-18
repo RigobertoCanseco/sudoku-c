@@ -1,0 +1,13 @@
+este programa crea un tablero de sudoku y lo resuelve
+
+.- clase CreatableroZudoku: 
+	crea el sudoku en un arreglo de 9x9
+	para crearlo,debe tener como argumento 
+	una matriz ya definida de 9x9
+.- clase resuelveZudoku:
+	resuelve un tablero de zudoku de 9x9 
+	de dificultad media y facil de 
+	menos de 40 numeros ocultos, debe tener como 
+	argumento una matriz ya definida de 9x9
+
+.- clase Zudoku contiene los metodos para utilizar
