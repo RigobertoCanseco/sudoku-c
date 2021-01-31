@@ -6,19 +6,24 @@
 #define SUDOKU_C_SUDOKU_H
 
 #define SIZE_SUDOKU 9
-typedef unsigned char cell;
-typedef unsigned char pos;
-typedef cell** sudoku;
-typedef cell* list;
 
-sudoku open_sudoku(char *file);
-void close_sudoku(sudoku ptr);
-list get_col(sudoku s, pos p);
-list get_row(sudoku s, pos p);
-list get_grid(sudoku s, pos r, pos c);
-list get_options(sudoku s, pos r, pos c);
-list** get_all_options(sudoku s);
-list** values(list** pList);
-void free_list(list l);
-void free_options(list** l);
+int** open_sudoku(char *file);
+void close_sudoku(int** ptr);
+
+void* f_row(void *s, int p, int i);
+void* f_col(void *s, int p, int i);
+void* f_grid(void *s, int i, int j);
+
+void* get_list(void *s, int p, void* (*f)(void* s, int p, int i));
+void* get_grid(int** s, int r, int c, void* (*f)(void *s, int i, int j));
+
+int* get_elements(void* s, int r, int c);
+int size_options(const int* a);
+
+int* get_options(void* s, int r, int c);
+int*** get_all_options(int** s);
+
+void free_list(int* l);
+void free_plist(int** l);
+void free_pplist(int*** l);
 #endif //SUDOKU_C_SUDOKU_H

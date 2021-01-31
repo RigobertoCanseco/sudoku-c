@@ -10,7 +10,7 @@
  * @param file File location
  * @return sudoku data type
  */
-sudoku open_sudoku(char *file) {
+int** open_sudoku(char *file) {
     printf("Opening file:%s ...\n", file);
     FILE *fp = fopen(file, "r");
     if (fp == NULL) {
@@ -18,91 +18,108 @@ sudoku open_sudoku(char *file) {
         return NULL;
     }
 
-    sudoku s = NULL;
+    int** s = calloc(SIZE_SUDOKU, sizeof (int*));
     int c, i = 0, j = 0;
-    s = calloc(SIZE_SUDOKU, sizeof (cell *));
-    s[0] = calloc(SIZE_SUDOKU, sizeof (cell));
+
+    s[0] = calloc(SIZE_SUDOKU, sizeof (int));
     while ((c = getc(fp)) != EOF) {
         if (c != '\n')
-            s[i][j++] = c;
+            s[i][j++] = c - '0';
         else {
             j = 0;
-            s[++i] = calloc(9, sizeof (cell));
+            s[++i] = calloc(SIZE_SUDOKU, sizeof (int));
         }
     }
     fclose(fp);
     return s;
 }
 
-void close_sudoku(sudoku ptr) {
+void close_sudoku(int** ptr) {
     for (int i = 0; i < SIZE_SUDOKU; i++) {
         free(ptr[i]);
     }
     free(ptr);
 }
 
-list get_col(sudoku s, pos p) {
-    list c = calloc(SIZE_SUDOKU, sizeof (cell));
-    for (int i = 0; i < SIZE_SUDOKU; i++)
-        c[i] = s[i][p];
-
-    return c;
+void* f_row(void *s, int p, int i) {
+    return &((int**)s)[p][i];
 }
 
-list get_row(sudoku s, pos p) {
-    list r = calloc(SIZE_SUDOKU, sizeof (cell));
-    for (int i = 0; i < SIZE_SUDOKU; i++)
-        r[i] = s[p][i];
-
-    return r;
+void* f_col(void* s, int p, int i) {
+    return &((int**)s)[i][p];
 }
 
-list get_grid(sudoku s, pos r, pos c) {
-    list g = calloc(SIZE_SUDOKU, sizeof (cell));
+void* f_grid(void* s, int i, int j) {
+    return &((int**)s)[i][j];
+}
+
+void* get_list(void* s, int p, void* (*f)(void *s, int p, int i)) {
+    int* l = calloc(SIZE_SUDOKU + 1, sizeof (int));
+    for (int i = 0; i < SIZE_SUDOKU;  i++)
+        l[i] = *(int*) f(s, p, i);
+    l[SIZE_SUDOKU] = EOF;
+    return l;
+}
+
+void* get_grid(int** s, int r, int c, void* (*f)(void *s, int i, int j)) {
+    int* l = calloc(SIZE_SUDOKU + 1, sizeof (int));
     int e = 0;
     for (int i = (r / (int) sqrt(SIZE_SUDOKU)) * 3; i <= (r / (int) sqrt(SIZE_SUDOKU)) * 3 + 2; i++)
         for (int j = (c / (int) sqrt(SIZE_SUDOKU)) * 3; j <= (c / (int) sqrt(SIZE_SUDOKU)) * 3 + 2; j++)
-            g[e++] = s[i][j];
-
-    return g;
+            l[e++] = *(int*)f(s, i, j);
+    l[SIZE_SUDOKU] = EOF;
+    return l;
 }
 
-list get_options(sudoku s, pos r, pos c) {
-    if(s[r][c] != '0') {
-        return NULL;
-    } else {
-        list column = get_col(s, c), row = get_row(s, r), grid = get_grid(s, r, c);
-        cell* cells = calloc(SIZE_SUDOKU, sizeof (cell));
-        for (int i = 0; i < SIZE_SUDOKU; i++) {
-            if (column[i] != '0')
-                cells[column[i] - 1 - '0'] = '1';
-            if (row[i] != '0')
-                cells[row[i] - 1 - '0'] = '1';
-            if (grid[i] != '0')
-                cells[grid[i] - 1 - '0'] = '1';
-        }
-        free_list(row);
-        free_list(column);
-        free_list(grid);
-
-        int count = 0;
-        for (int i = 0; i < SIZE_SUDOKU; i++)
-            if (cells[i] != '1')
-                count++;
-        list l = calloc(count, sizeof (cell));
-        for (int n = 0, i = 0; n < SIZE_SUDOKU; n++)
-            if(cells[n] != '1')
-                l[i++] = (n + 1) + '0';
-
-        free(cells);
-        return l;
-    }
-}
-
-list** get_all_options(sudoku s) {
-    list** options = calloc(SIZE_SUDOKU, sizeof (list*));
+int* get_elements(void* s, int r, int c) {
+    int* column = (int*) get_list(s, c, f_col);
+    int* row = (int*) get_list(s, r, f_row);
+    int* grid = (int*) get_grid(s, r, c, f_grid);
+    int* cells = calloc(SIZE_SUDOKU, sizeof (int));
     for (int i = 0; i < SIZE_SUDOKU; i++) {
-        options[i] = calloc(SIZE_SUDOKU, sizeof (list));
+        if (column[i] != 0)
+            cells[column[i] - 1] = 1;
+        else if (row[i] != 0)
+            cells[row[i] - 1] = 1;
+        else if (grid[i] != 0)
+            cells[grid[i] - 1] = 1;
+    }
+    free_list(row);
+    free_list(column);
+    free_list(grid);
+    return cells;
+}
+
+int size_options(const int* a) {
+    int size = 0;
+    for (int i = 0; i < SIZE_SUDOKU; i++)
+        if (a[i] != 1)
+            size++;
+    return size;
+}
+
+int* options(void* s, int r, int c) {
+    int* o = get_elements(s, r, c);
+    int size = size_options(o);
+    int* l = calloc(size + 1, sizeof (int));
+    for (int n = 0, i = 0; n < SIZE_SUDOKU; n++)
+        if(o[n] != 1)
+            l[i++] = n + 1;
+    l[size] = EOF;
+    free(o);
+    return l;
+}
+
+int* get_options(void* s, int r, int c) {
+    if(  ((int***)s)[r][c] != 0 )
+        return NULL;
+    return options(s, r, c);
+}
+
+int*** get_all_options(int** s) {
+    int*** options = calloc(SIZE_SUDOKU, sizeof (int**));
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        options[i] = calloc(SIZE_SUDOKU, sizeof (int*));
         for (int j = 0; j < SIZE_SUDOKU; j++) {
             options[i][j] = get_options(s, i, j);
         }
@@ -110,26 +127,21 @@ list** get_all_options(sudoku s) {
     return options;
 }
 
-list** values(list** pList) {
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        for (int j = 0; j < SIZE_SUDOKU; j++) {
-            if(pList[i][j] != NULL){
-
-            }
-        }
-    }
-}
-
-
-void free_list(list l) {
+void free_list(int* l) {
     free(l);
 }
 
-void free_options(list** l) {
+void free_pplist(int*** l) {
     for (int i = 0; i < SIZE_SUDOKU; i++) {
         for (int j = 0; j < SIZE_SUDOKU; j++)
             free(l[i][j]);
         free(l[i]);
     }
+    free(l);
+}
+
+void free_plist(int** l) {
+    for (int i = 0; i < SIZE_SUDOKU; i++)
+        free(l[i]);
     free(l);
 }
