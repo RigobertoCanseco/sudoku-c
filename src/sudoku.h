@@ -6,24 +6,27 @@
 #define SUDOKU_C_SUDOKU_H
 
 #define SIZE_SUDOKU 9
+#define SIZE_SQRT (int) sqrt(SIZE_SUDOKU)
 
-int** open_sudoku(char *file);
-void close_sudoku(int** ptr);
+int** open_sudoku(char* file);
+void print(int* l);
+int* get_row(int** a2d, int r);
+int** get_row_2d(int*** a3d, int r);
+int* get_col(int** a2d, int c);
+int** get_col_2d(int*** a3d, int c);
+int* get_grid(int** a2d, int r, int c);
+int** get_grid_2d(int*** a3d, int r, int c);
+int** get_map_2d(int** a2d, int r, int c);
+int*** get_map_3d(int*** a3d, int r, int c);
 
-void* f_row(void *s, int p, int i);
-void* f_col(void *s, int p, int i);
-void* f_grid(void *s, int i, int j);
-
-void* get_list(void *s, int p, void* (*f)(void* s, int p, int i));
-void* get_grid(int** s, int r, int c, void* (*f)(void *s, int i, int j));
-
-int* get_elements(void* s, int r, int c);
+int* get_elements(int** a2d, int r, int c);
 int size_options(const int* a);
 
-int* get_options(void* s, int r, int c);
+int* get_options(int** s, int r, int c);
 int*** get_all_options(int** s);
 
-void free_list(int* l);
-void free_plist(int** l);
-void free_pplist(int*** l);
+void* unique_value(void *s, int r, int c);
+
+void free_a2d(int** l);
+void free_a3d(int*** l);
 #endif //SUDOKU_C_SUDOKU_H
