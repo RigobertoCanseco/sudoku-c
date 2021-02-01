@@ -71,16 +71,14 @@ int main(int argc, char** argv) {
     }
     free_a2d(grids);
 
-
-    /*
     int*** ls4 = get_map_3d(ls3, y, x);
-    printf("Map: options\n");
+    printf("Map options:\n");
     for(int  i = 0; i < 21; i++) {
         printf("[%d,%d]: ", ls4[i][0][0], ls4[i][0][1]);
-        print(ls4[0][1]);
+        print(ls4[i][1]);
     }
     free_a3d(ls4);
-     */
+
 
     free_a3d(ls3);
     free_a2d(s);

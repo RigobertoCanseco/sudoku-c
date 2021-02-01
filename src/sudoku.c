@@ -142,9 +142,15 @@ void insert_in_map_3d(int*** map, int r, int c, int* v) {
     p[0] = r;
     p[1] = c;
     p[2] = EOF;
+
+    int s = size(v);
+    int* a = calloc(s + 1, sizeof (int));
+    for(int j = 0; j < s; j++)
+        a[j] = v[j];
+    a[s] = EOF;
     map[i] = calloc(3, sizeof (int*));
     map[i][0] = p;
-    map[i][1] = v;
+    map[i][1] = a;
     map[i][2] = NULL;
 }
 
@@ -159,7 +165,8 @@ int** get_map_2d(int** a2d, int r, int c) {
     for (int i = 0; i < SIZE_SUDOKU; i++)
         insert_in_map_2d(map, i, c, col[i]);
     for (int i = 0; i < SIZE_SUDOKU; i++)
-        insert_in_map_2d(map, (r / SIZE_SQRT) * 3 + i / SIZE_SQRT,  (c / SIZE_SQRT) * 3 + i % SIZE_SQRT, grid[i]);
+        insert_in_map_2d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
+                         (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]);
 
     map[21] = NULL;
     free(row);
@@ -180,7 +187,8 @@ int*** get_map_3d(int*** a3d, int r, int c) {
     for (int i = 0; i < SIZE_SUDOKU; i++)
         insert_in_map_3d(map, i, c, col[i]);
     for (int i = 0; i < SIZE_SUDOKU; i++)
-        insert_in_map_3d(map, (r / SIZE_SQRT) * 3 + i / SIZE_SQRT,  (c / SIZE_SQRT) * 3 + i % SIZE_SQRT, grid[i]);
+        insert_in_map_3d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
+                         (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]);
 
     map[21] = NULL;
     free_a2d(row);
@@ -330,10 +338,12 @@ void* unique_value(void *s, int r, int c) {
 }
 
 void free_a3d(int*** a3d) {
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        for (int j = 0; j < SIZE_SUDOKU; j++)
-            free(a3d[i][j]);
-        free(a3d[i]);
+    int i = 0;
+    if(a3d != NULL) {
+        int j = 0;
+        while (a3d[i][j] != NULL)
+            free(a3d[i][j++]);
+        free(a3d[i++]);
     }
     free(a3d);
 }
