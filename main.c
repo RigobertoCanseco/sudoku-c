@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
         printf("Row[%d][%d]:", y, i);
         print(rows[i]);
     }
+    free_a2d(rows);
 
     printf("Cols:\n");
     int** cols = get_col_2d(ls3, x);
@@ -60,6 +61,7 @@ int main(int argc, char** argv) {
         printf("Col[%d][%d]:", i, x);
         print(cols[i]);
     }
+    free_a2d(cols);
 
     printf("Grids:\n");
     int** grids = get_grid_2d(ls3, y, x);
@@ -67,10 +69,8 @@ int main(int argc, char** argv) {
         printf("Grid[%d]:", i);
         print(grids[i]);
     }
-
-    free_a2d(rows);
-    free_a2d(cols);
     free_a2d(grids);
+
 
     /*
     int*** ls4 = get_map_3d(ls3, y, x);

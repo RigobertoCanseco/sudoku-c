@@ -27,12 +27,12 @@ int** open_sudoku(char *file) {
             s[i][j++] = c - '0';
         }
         else {
-            s[i][SIZE_SUDOKU] = '\0';
+            s[i][SIZE_SUDOKU] = EOF;
             j = 0;
             s[++i] = calloc(SIZE_SUDOKU + 1, sizeof (int));
         }
     }
-    s[8][SIZE_SUDOKU] = '\0';
+    s[8][SIZE_SUDOKU] = EOF;
     s[SIZE_SUDOKU] = NULL;
     fclose(fp);
     return s;
@@ -42,7 +42,7 @@ int size(const int* a) {
     if (a == NULL)
         return 0;
     int i = 0;
-    while(a[i] != '\0')
+    while(a[i] != EOF)
         i++;
     return i;
 }
@@ -51,7 +51,7 @@ int* get_row(int** a2d, int r) {
     int* a = calloc(SIZE_SUDOKU + 1, sizeof (int));
     for (int i = 0; i < SIZE_SUDOKU; i++)
         a[i] = a2d[r][i];
-    a[SIZE_SUDOKU] = '\0';
+    a[SIZE_SUDOKU] = EOF;
     return a;
 }
 
@@ -62,7 +62,7 @@ int** get_row_2d(int*** a3d, int r) {
         int* a = calloc(s + 1, sizeof (int));
         for(int j = 0; j < s; j++)
             a[j] = a3d[r][i][j];
-        a[s] = '\0';
+        a[s] = EOF;
         a2d[i] = a;
     }
     a2d[SIZE_SUDOKU] = NULL;
@@ -73,7 +73,7 @@ int* get_col(int** a2d, int c) {
     int* a = calloc(SIZE_SUDOKU + 1, sizeof (int));
     for (int i = 0; i < SIZE_SUDOKU; i++)
         a[i] = a2d[i][c];
-    a[SIZE_SUDOKU] = '\0';
+    a[SIZE_SUDOKU] = EOF;
     return a;
 }
 
@@ -84,7 +84,7 @@ int** get_col_2d(int*** a3d, int c) {
         int* a = calloc(s + 1, sizeof (int));
         for(int j = 0; j < s; j++)
             a[j] = a3d[i][c][j];
-        a[s] = '\0';
+        a[s] = EOF;
         a2d[i] = a;
     }
     a2d[SIZE_SUDOKU] = NULL;
@@ -97,7 +97,7 @@ int* get_grid(int** a2d, int r, int c) {
     for (int i = (r / SIZE_SQRT) * SIZE_SQRT; i <= (r / SIZE_SQRT) * SIZE_SQRT + SIZE_SQRT - 1; i++)
         for (int j = (c / SIZE_SQRT) * SIZE_SQRT; j <= (c / SIZE_SQRT) * SIZE_SQRT + SIZE_SQRT - 1; j++)
             l[e++] = a2d[i][j];
-    l[SIZE_SUDOKU] = '\0';
+    l[SIZE_SUDOKU] = EOF;
     return l;
 }
 
@@ -110,7 +110,7 @@ int** get_grid_2d(int*** a3d, int r, int c) {
             int* a = calloc(s + 1, sizeof (int));
             for(int k = 0; k < s; k++)
                 a[k] = a3d[i][j][k];
-            a[s] = '\0';
+            a[s] = EOF;
             a2d[e++] = a;
         }
     a2d[SIZE_SUDOKU] = NULL;
@@ -128,7 +128,7 @@ void insert_in_map_2d(int** map, int r, int c, int v) {
     map[i][0] = r;
     map[i][1] = c;
     map[i][2] = v;
-    map[i][3] = '\0';
+    map[i][3] = EOF;
 }
 
 void insert_in_map_3d(int*** map, int r, int c, int* v) {
@@ -141,7 +141,7 @@ void insert_in_map_3d(int*** map, int r, int c, int* v) {
     int* p = calloc(3, sizeof (int));
     p[0] = r;
     p[1] = c;
-    p[2] = '\0';
+    p[2] = EOF;
     map[i] = calloc(3, sizeof (int*));
     map[i][0] = p;
     map[i][1] = v;
@@ -202,7 +202,7 @@ int* get_elements(int** a2d, int r, int c) {
             cells[row[i] - 1] = 1;
         else if (grid[i] != 0)
             cells[grid[i] - 1] = 1;
-    cells[SIZE_SUDOKU] = '\0';
+    cells[SIZE_SUDOKU] = EOF;
     free(row);
     free(column);
     free(grid);
@@ -226,7 +226,7 @@ int* get_options(int** a2d, int r, int c) {
     for (int n = 0, i = 0; n < SIZE_SUDOKU; n++)
         if(o[n] != 1)
             a[i++] = n + 1;
-    a[size] = '\0';
+    a[size] = EOF;
     free(o);
     return a;
 }
@@ -249,7 +249,7 @@ int*** get_all_options(int** a2d) {
 int search(const int* a, int v) {
     int i = 0;
     if (a != NULL)
-        while (a[i] != '\0')
+        while (a[i] != EOF)
             if (a[i++] == v)
                 return 1;
     return 0;
@@ -274,7 +274,7 @@ int* get_unique_value(int** a2d) {
                 }
             }
     }
-    pos[SIZE_SUDOKU] = '\0';
+    pos[SIZE_SUDOKU] = EOF;
     return pos;
 }
 
@@ -349,7 +349,7 @@ void free_a2d(int** a2d) {
 void print(int* a) {
     int i = 0;
     if(a != NULL)
-        while (a[i] != '\0')
+        while (a[i] != EOF)
             printf("%d ", a[i++]);
     printf("\n");
 }
