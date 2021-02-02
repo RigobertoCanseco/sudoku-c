@@ -9,7 +9,7 @@
 int main(int argc, char** argv) {
     int** s = open_sudoku("../resources/sudoku-01.txt");
     printf("Sudoku ok\n");
-    int x = 2, y = 0;
+    int x = 0, y = 2;
 
     printf("Row:\n");
     int* row = get_row(s, y);
@@ -53,6 +53,10 @@ int main(int argc, char** argv) {
         printf("Row[%d][%d]:", y, i);
         print(rows[i]);
     }
+    printf("Unique:");
+    int* u = unique(rows);
+    print(u);
+    free(u);
     free_a2d(rows);
 
     printf("Cols:\n");
@@ -61,6 +65,10 @@ int main(int argc, char** argv) {
         printf("Col[%d][%d]:", i, x);
         print(cols[i]);
     }
+    printf("Unique:");
+    u = unique(cols);
+    print(u);
+    free(u);
     free_a2d(cols);
 
     printf("Grids:\n");
@@ -69,6 +77,10 @@ int main(int argc, char** argv) {
         printf("Grid[%d]:", i);
         print(grids[i]);
     }
+    printf("Unique:");
+    u = unique(grids);
+    print(u);
+    free(u);
     free_a2d(grids);
 
     int*** ls4 = get_map_3d(ls3, y, x);
