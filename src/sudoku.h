@@ -110,18 +110,70 @@ static inline int** get_grid_2d(int*** a3d, int r, int c) {
     return a2d;
 }
 
-int** open_sudoku(char* file);
+static inline int* get_options(int** a2d, int r, int c) {
+    if(a2d[r][c] != 0) return NULL;
+    int *column = get_col(a2d, c), *row = get_row(a2d, r), *grid = get_grid(a2d, r, c), size = 0,
+            *cells = calloc(SIZE_SUDOKU + 1, sizeof (int));
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        if (column[i] != 0)
+            cells[column[i] - 1] = 1;
+        if (row[i] != 0)
+            cells[row[i] - 1] = 1;
+        if (grid[i] != 0)
+            cells[grid[i] - 1] = 1;
+    }
+    cells[SIZE_SUDOKU] = EOF;
+    free(row), free(column), free(grid);
 
+    for (int i = 0; i < SIZE_SUDOKU; i++) if (cells[i] != 1) size++;
+    int *a = calloc(size + 1, sizeof (int));
+    for (int n = 0, i = 0; n < SIZE_SUDOKU; n++)
+        if(cells[n] != 1)
+            a[i++] = n + 1;
+    a[size] = EOF;
+    free(cells);
+    return a;
+}
+
+static inline int*** get_all_options(int **a2d) {
+    int*** a3d = calloc(SIZE_SUDOKU + 1, sizeof (int**));
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        a3d[i] = calloc(SIZE_SUDOKU + 1 , sizeof (int*));
+        for (int j = 0; j < SIZE_SUDOKU; a3d[i][j] = a2d[i][j] == 0?get_options(a2d, i, j): NULL, j++);
+        a3d[i][SIZE_SUDOKU] = NULL;
+    }
+    a3d[SIZE_SUDOKU] = NULL;
+    return a3d;
+}
+
+static inline int* is_unique(int** a2d) {
+    if (a2d == NULL) return NULL;
+    int **pos = calloc(SIZE_SUDOKU + 1, sizeof (int*));
+    for (int i = 0; i < SIZE_SUDOKU; pos[i] = calloc(SIZE_SUDOKU + 1, sizeof(int)), pos[i][0] = EOF, i++);
+    pos[SIZE_SUDOKU] = NULL;
+
+    for (int i = 1; i <= SIZE_SUDOKU; i++)
+        for ( int j = 0, c = 0; a2d[j] != NULL; j++)
+            if (search(a2d[j], i) == 1)
+                pos[i - 1][c++] = j, pos[i - 1][c] = EOF;
+
+    int u = 0, p;
+    for (int i = 0; i < SIZE_SUDOKU; i++)
+        if (size(pos[i]) == 1 && u == 0)
+            u = i + 1, p = pos[i][0];
+
+    if (u == 0)
+        return NULL;
+    int* a = calloc(3, sizeof (int));
+    a[0] = u, a[1] = p, a[2] = EOF;
+    free_a2d(pos);
+
+    return a;
+}
+
+int** open_sudoku(char* file);
 int** get_map_2d(int** a2d, int r, int c);
 int*** get_map_3d(int*** a3d, int r, int c);
-
-int* get_elements(int** a2d, int r, int c);
-int size_options(const int* a);
-
-int* get_options(int** s, int r, int c);
-int*** get_all_options(int** s);
-
-int* unique(int** a2d);
-
+void reduce(int** a2d);
 
 #endif //SUDOKU_C_SUDOKU_H

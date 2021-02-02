@@ -109,7 +109,7 @@ int*** get_map_3d(int*** a3d, int r, int c) {
         insert_in_map_3d(map, i, c, col[i]);
     for (int i = 0; i < SIZE_SUDOKU; i++)
         insert_in_map_3d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
-                         (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]);
+        (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]);
 
     map[21] = NULL;
     free_a2d(row);
@@ -119,97 +119,43 @@ int*** get_map_3d(int*** a3d, int r, int c) {
     return map;
 }
 
-int* get_options(int** a2d, int r, int c) {
-    if(a2d[r][c] != 0)
-        return NULL;
-    int *column = get_col(a2d, c), *row = get_row(a2d, r), *grid = get_grid(a2d, r, c),
-            *cells = calloc(SIZE_SUDOKU + 1, sizeof (int));
+
+void reduce(int** a2d) {
+    int ***a3d = get_all_options(a2d);
+    int **r = NULL, **c = NULL, *u = NULL, **g = NULL;
     for (int i = 0; i < SIZE_SUDOKU; i++) {
-        if (column[i] != 0)
-            cells[column[i] - 1] = 1;
-        if (row[i] != 0)
-            cells[row[i] - 1] = 1;
-        if (grid[i] != 0)
-            cells[grid[i] - 1] = 1;
+        r = get_row_2d(a3d, i);
+        u = is_unique(r);
+        if (u != NULL) {
+            a2d[i][u[1]] = u[0];
+        }
+        free_a2d(r);
+        free(u);
     }
-    cells[SIZE_SUDOKU] = EOF;
 
-    int size = 0;
-    for (int i = 0; i < SIZE_SUDOKU; i++) if (cells[i] != 1) size++;
-    int *a = calloc(size + 1, sizeof (int));
-    for (int n = 0, i = 0; n < SIZE_SUDOKU; n++)
-        if(cells[n] != 1)
-            a[i++] = n + 1;
-    a[size] = EOF;
-
-    free(cells);
-    free(row);
-    free(column);
-    free(grid);
-    return a;
-}
-
-int*** get_all_options(int** a2d) {
-    int*** a3d = calloc(SIZE_SUDOKU + 1, sizeof (int**));
     for (int i = 0; i < SIZE_SUDOKU; i++) {
-        a3d[i] = calloc(SIZE_SUDOKU + 1 , sizeof (int*));
-        for (int j = 0; j < SIZE_SUDOKU; j++)
-            if(a2d[i][j] == 0)
-                a3d[i][j] = get_options(a2d, i, j);
-            else
-                a3d[i][j] = NULL;
-        a3d[i][SIZE_SUDOKU] = NULL;
+        c = get_col_2d(a3d, i);
+        u = is_unique(c);
+        if (u != NULL) {
+            a2d[u[1]][i] = u[0];
+        }
+        free_a2d(c);
+        free(u);
     }
-    a3d[SIZE_SUDOKU] = NULL;
-    return a3d;
-}
 
-int* unique(int** a2d) {
-    if (a2d == NULL)
-        return NULL;
-    int** positions = calloc(SIZE_SUDOKU + 1, sizeof (int*));
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        positions[i] = calloc(SIZE_SUDOKU + 1, sizeof(int));
-        positions[i][0] = EOF;
-    }
-    positions[SIZE_SUDOKU] = NULL;
-
-    for (int i = 1; i <= SIZE_SUDOKU; i++) {
-        int j = 0, c = 0;
-        while (a2d[j] != NULL) {
-            if (search(a2d[j], i) == 1) {
-                positions[i - 1][c++] = j;
-                positions[i - 1][c] = EOF;
+    for(int i = 0; i < SIZE_SQRT; i+=SIZE_SQRT) {
+        for(int j = 0; j < SIZE_SQRT; j+=SIZE_SQRT) {
+            g = get_grid_2d(a3d, i, j);
+            u = is_unique(g);
+            if (u != NULL) {
+                a2d[(i / SIZE_SQRT) * SIZE_SQRT + u[1] / SIZE_SQRT]
+                [(j / SIZE_SQRT) * SIZE_SQRT + u[1] % SIZE_SQRT] = u[0];
             }
-            j++;
+            free_a2d(g);
+            free(u);
         }
     }
 
-    int u = 0, p;
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        if (size(positions[i]) == 1) {
-            if (u == 0) {
-                u = i + 1;
-                p = positions[i][0];
-            } else
-                return NULL;
-        }
-    }
-    if (u == 0)
-        return NULL;
-    int* a = calloc(3, sizeof (int));
-    a[0] = u;
-    a[1] = p;
-    a[2] = EOF;
-    free_a2d(positions);
-
-    return a;
-}
-
-int** reduce(int** a2d) {
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        for (int j = 0; j < SIZE_SUDOKU; j++) {
-        }
-    }
+    free_a3d(a3d);
 }
 

@@ -9,7 +9,7 @@
 int main(int argc, char** argv) {
     int** s = open_sudoku("../resources/sudoku-01.txt");
     printf("Sudoku ok\n");
-    int x = 0, y = 2;
+    int x = 0, y = 3;
 
     printf("Row:\n");
     int* row = get_row(s, y);
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
         print(rows[i]);
     }
     printf("Unique:");
-    int* u = unique(rows);
+    int* u = is_unique(rows);
     print(u);
     free(u);
     free_a2d(rows);
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
         print(cols[i]);
     }
     printf("Unique:");
-    u = unique(cols);
+    u = is_unique(cols);
     print(u);
     free(u);
     free_a2d(cols);
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
         print(grids[i]);
     }
     printf("Unique:");
-    u = unique(grids);
+    u = is_unique(grids);
     print(u);
     free(u);
     free_a2d(grids);
@@ -90,9 +90,14 @@ int main(int argc, char** argv) {
         print(ls4[i][1]);
     }
     free_a3d(ls4);
-
-
     free_a3d(ls3);
+
+    printf("Sudoku reduce\n");
+    reduce(s);
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        print(s[i]);
+    }
+
     free_a2d(s);
 
     return EXIT_SUCCESS;
