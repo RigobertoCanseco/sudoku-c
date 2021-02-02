@@ -171,9 +171,64 @@ static inline int* is_unique(int** a2d) {
     return a;
 }
 
+static inline void insert_in_map_2d(int** map, int r, int c, int v) {
+    int i = 0;
+    while (map[i] != NULL)
+        if (map[i][0] == r && map[i][1] == c) return;
+        else i++;
+    map[i] = calloc(4, sizeof(int)), map[i][0] = r, map[i][1] = c, map[i][2] = v, map[i][3] = EOF;
+}
+
+static inline int** get_map_2d(int** a2d, int r, int c) {
+    int* row = get_row(a2d, r);
+    int* col = get_col(a2d, c);
+    int* grid = get_grid(a2d, r, c);
+    int** map = calloc(22, sizeof (int*));
+
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_2d(map, r, i, row[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_2d(map, i, c, col[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_2d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
+    (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]), i++);
+
+    map[21] = NULL;
+    free(row), free(grid), free(col);
+
+    return map;
+}
+
+static inline void insert_in_map_3d(int*** map, int r, int c, int* v) {
+    int i = 0;
+    while (map[i] != NULL)
+        if (map[i][0][0] == r && map[i][0][1] == c)
+            return ;
+        else i++;
+
+    int *p = calloc(3, sizeof (int));
+    p[0] = r, p[1] = c, p[2] = EOF;
+    int s = size(v);
+    int *a = calloc(s + 1, sizeof (int));
+    for(int j = 0; j < s; a[j] = v[j], j++);
+    a[s] = EOF;
+    map[i] = calloc(3, sizeof (int*)), map[i][0] = p, map[i][1] = a, map[i][2] = NULL;
+}
+
+static inline int*** get_map_3d(int*** a3d, int r, int c) {
+    int** row = get_row_2d(a3d, r);
+    int** col = get_col_2d(a3d, c);
+    int** grid = get_grid_2d(a3d, r, c);
+    int*** map = calloc(22, sizeof (int**));
+
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_3d(map, r, i, row[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_3d(map, i, c, col[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_3d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
+                                                      (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]), i++);
+    map[21] = NULL;
+    free_a2d(row), free_a2d(grid), free_a2d(col);
+    return map;
+}
+
 int** open_sudoku(char* file);
-int** get_map_2d(int** a2d, int r, int c);
-int*** get_map_3d(int*** a3d, int r, int c);
+
 void reduce(int** a2d);
 
 #endif //SUDOKU_C_SUDOKU_H
