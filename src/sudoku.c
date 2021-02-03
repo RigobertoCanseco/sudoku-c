@@ -38,42 +38,12 @@ int** open_sudoku(char *file) {
     return s;
 }
 
-void reduce(int** a2d) {
-    int ***a3d = get_all_options(a2d);
-    int **r = NULL, **c = NULL, *u = NULL, **g = NULL;
+int reduce(int** a2d) {
+    int j = 0;
     for (int i = 0; i < SIZE_SUDOKU; i++) {
-        r = get_row_2d(a3d, i);
-        u = is_unique(r);
-        if (u != NULL) {
-            a2d[i][u[1]] = u[0];
-        }
-        free_a2d(r);
-        free(u);
+        j = get_unique_in_row(a2d, i) | get_unique_in_col(a2d, i) | get_unique_in_grid(a2d, i);
     }
-
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        c = get_col_2d(a3d, i);
-        u = is_unique(c);
-        if (u != NULL) {
-            a2d[u[1]][i] = u[0];
-        }
-        free_a2d(c);
-        free(u);
-    }
-
-    for(int i = 0; i < SIZE_SQRT; i+=SIZE_SQRT) {
-        for(int j = 0; j < SIZE_SQRT; j+=SIZE_SQRT) {
-            g = get_grid_2d(a3d, i, j);
-            u = is_unique(g);
-            if (u != NULL) {
-                a2d[(i / SIZE_SQRT) * SIZE_SQRT + u[1] / SIZE_SQRT]
-                [(j / SIZE_SQRT) * SIZE_SQRT + u[1] % SIZE_SQRT] = u[0];
-            }
-            free_a2d(g);
-            free(u);
-        }
-    }
-
-    free_a3d(a3d);
+    printf("re:%d\n", j);
+    return j;
 }
 
