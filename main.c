@@ -11,15 +11,23 @@ int main(int argc, char** argv) {
     printf("Sudoku ok\n");
 
     printf("Sudoku reduce\n");
-    int i = 0;
-  do {
-      i = reduce(s);
-  } while(i);
+    reduce(s);
+    printf("Sudoku\n");
 
     for (int i = 0; i < SIZE_SUDOKU; i++) {
         print(s[i]);
     }
-    i = reduce(s);
+    reduce(s);
+    printf("Sudoku\n");
 
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        print(s[i]);
+    }
+    reduce(s);
+    printf("Sudoku\n");
+
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        print(s[i]);
+    }
     return EXIT_SUCCESS;
 }

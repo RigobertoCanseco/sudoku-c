@@ -38,12 +38,13 @@ int** open_sudoku(char *file) {
     return s;
 }
 
-int reduce(int** a2d) {
-    int j = 0;
+void reduce(int **a2d) {
     for (int i = 0; i < SIZE_SUDOKU; i++) {
-        j = get_unique_in_row(a2d, i) | get_unique_in_col(a2d, i) | get_unique_in_grid(a2d, i);
+        for (int j = 0; j < SIZE_SUDOKU; j++) {
+            int **cols = calloc(SIZE_SUDOKU, sizeof (int*));
+            cols[i] = get_options(a2d, i, j);
+        }
+
     }
-    printf("re:%d\n", j);
-    return j;
 }
 

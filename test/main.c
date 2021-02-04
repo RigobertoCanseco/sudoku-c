@@ -3,7 +3,7 @@
 //
 #include<stdio.h>
 #include <malloc.h>
-
+#include "../src/sudoku.h"
 typedef struct dynamic_cast dynamic_cast;
 
 int** g_num();
@@ -118,5 +118,130 @@ void row(void* a) {
     for (int k = 0; k < 3; k++) {
         int n = *(d + ((sizeof(d))*(i+ 1) + k));
         printf("%d", n);
+    }
+}
+
+
+static inline int*** get_all_options(int **a2d) {
+    int*** a3d = calloc(SIZE_SUDOKU + 1, sizeof (int**));
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        a3d[i] = calloc(SIZE_SUDOKU + 1 , sizeof (int*));
+        for (int j = 0; j < SIZE_SUDOKU; a3d[i][j] = a2d[i][j] == 0?get_options(a2d, i, j): NULL, j++);
+        a3d[i][SIZE_SUDOKU] = NULL;
+    }
+    a3d[SIZE_SUDOKU] = NULL;
+    return a3d;
+}
+
+static inline int*** get_map_3d(int*** a3d, int r, int c) {
+    int** row = get_row_2d(a3d, r);
+    int** col = get_col_2d(a3d, c);
+    int** grid = get_grid_2d(a3d, r, c);
+    int*** map = calloc(22, sizeof (int**));
+
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_3d(map, r, i, row[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_3d(map, i, c, col[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_3d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
+                                                      (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]), i++);
+    map[21] = NULL;
+    free_a2d(row), free_a2d(grid), free_a2d(col);
+    return map;
+}
+
+
+static inline void insert_in_map_3d(int*** map, int r, int c, int* v) {
+    int i = 0;
+    while (map[i] != NULL)
+        if (map[i][0][0] == r && map[i][0][1] == c)
+            return ;
+        else i++;
+
+    int *p = calloc(3, sizeof (int));
+    p[0] = r, p[1] = c, p[2] = EOF;
+    int s = size(v);
+    int *a = calloc(s + 1, sizeof (int));
+    for(int j = 0; j < s; a[j] = v[j], j++);
+    a[s] = EOF;
+    map[i] = calloc(3, sizeof (int*)), map[i][0] = p, map[i][1] = a, map[i][2] = NULL;
+}
+
+
+static inline int** get_map_2d(int** a2d, int r, int c) {
+    int* row = get_row(a2d, r);
+    int* col = get_col(a2d, c);
+    int* grid = get_grid(a2d, r, c);
+    int** map = calloc(22, sizeof (int*));
+
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_2d(map, r, i, row[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_2d(map, i, c, col[i]), i++);
+    for (int i = 0; i < SIZE_SUDOKU; insert_in_map_2d(map, (r / SIZE_SQRT) * SIZE_SQRT + i / SIZE_SQRT,
+                                                      (c / SIZE_SQRT) * SIZE_SQRT + i % SIZE_SQRT, grid[i]), i++);
+
+    map[21] = NULL;
+    free(row), free(grid), free(col);
+
+    return map;
+}
+
+static inline void insert_in_map_2d(int** map, int r, int c, int v) {
+    int i = 0;
+    while (map[i] != NULL)
+        if (map[i][0] == r && map[i][1] == c) return;
+        else i++;
+    map[i] = calloc(4, sizeof(int)), map[i][0] = r, map[i][1] = c, map[i][2] = v, map[i][3] = EOF;
+}
+
+
+static inline int** get_row_2d(int*** a3d, int r) {
+    int** a2d = calloc(SIZE_SUDOKU + 1, sizeof (int*));
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        int s = size(a3d[r][i]), *a = calloc(s + 1, sizeof (int));
+        for(int j = 0; j < s; a[j] = a3d[r][i][j], j++);
+        a[s] = EOF, a2d[i] = a;
+    }
+    a2d[SIZE_SUDOKU] = NULL;
+    return a2d;
+}
+
+static inline int** get_col_2d(int*** a3d, int c) {
+    int** a2d = calloc(SIZE_SUDOKU + 1, sizeof (int*));
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        int s = size(a3d[i][c]), *a = calloc(s + 1, sizeof (int));
+        for(int j = 0; j < s;  a[j] = a3d[i][c][j], j++);
+        a[s] = EOF, a2d[i] = a;
+    }
+    a2d[SIZE_SUDOKU] = NULL;
+    return a2d;
+}
+
+static inline int** get_grid_2d(int*** a3d, int r, int c) {
+    int **a2d = calloc(SIZE_SUDOKU + 1, sizeof (int*)), e = 0;
+    for (int i = (r / SIZE_SQRT) * SIZE_SQRT; i <= (r / SIZE_SQRT) * SIZE_SQRT + SIZE_SQRT - 1; i++)
+        for (int j = (c / SIZE_SQRT) * SIZE_SQRT; j <= (c / SIZE_SQRT) * SIZE_SQRT + SIZE_SQRT - 1; j++) {
+            int s = size(a3d[i][j]), *a = calloc(s + 1, sizeof (int));
+            for(int k = 0; k < s;  a[k] = a3d[i][j][k], k++);
+            a[s] = EOF, a2d[e++] = a;
+        }
+    a2d[SIZE_SUDOKU] = NULL;
+    return a2d;
+}
+
+static inline void free_a3d(int*** a3d) {
+    int i = 0;
+    if(a3d != NULL) {
+        int j = 0;
+        while(a3d[i] != NULL) {
+            while (a3d[i][j] != NULL)
+                free(a3d[i][j++]);
+            free(a3d[i++]);
+        }
+        free(a3d);
+    }
+}
+
+static inline void replace_value(int** a2d, int *a) {
+    if (a != NULL) {
+        a2d[a[1]][a[2]] = a[0];
+        free(a);
     }
 }
