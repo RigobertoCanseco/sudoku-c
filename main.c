@@ -12,22 +12,7 @@ int main(int argc, char** argv) {
 
     printf("Sudoku reduce\n");
     reduce(s);
-    printf("Sudoku\n");
 
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        print(s[i]);
-    }
-    reduce(s);
-    printf("Sudoku\n");
 
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        print(s[i]);
-    }
-    reduce(s);
-    printf("Sudoku\n");
-
-    for (int i = 0; i < SIZE_SUDOKU; i++) {
-        print(s[i]);
-    }
     return EXIT_SUCCESS;
 }

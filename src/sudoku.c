@@ -1,3 +1,4 @@
+
 //
 // Created by rigoberto on 27/01/21.
 //
@@ -38,13 +39,32 @@ int** open_sudoku(char *file) {
     return s;
 }
 
-void reduce(int **a2d) {
+int reduce(int **a2d) {
+    printf("Sudoku\n");
+    for (int i = 0; i < SIZE_SUDOKU; i++) {
+        print(a2d[i]);
+    }
     for (int i = 0; i < SIZE_SUDOKU; i++) {
         for (int j = 0; j < SIZE_SUDOKU; j++) {
-            int **cols = calloc(SIZE_SUDOKU, sizeof (int*));
-            cols[i] = get_options(a2d, i, j);
+            //printf("[%d, %d] = ", i, j);
+            int *option = get_options(a2d, i, j);
+            //print(option);
+            if (option != NULL) {
+                int c = 0;
+                for (int k = 0; k < SIZE_SUDOKU; k++) {
+                    if (option[k] == 0) {
+                        a2d[i][j] = k + 1;
+                        reduce(a2d);
+                    } else c++;
+                }
+                if (c == 9) {
+                    printf("%d, %d\n", i, j);
+                    return 0;
+                }
+            }
+            free(option);
         }
-
     }
+    return 1;
 }
 

@@ -7,19 +7,15 @@
 #define SIZE_SUDOKU 9
 #define SIZE_SQRT 3
 
-static inline void free_a2d(int** a2d) {
-    for (int i = 0; a2d[i] != NULL; free(a2d[i]), i++);
-    free(a2d);
-}
-
 static inline void print(int* a) {
     if (a != NULL)
-        for (int i = 0; a[i] != EOF; printf("%d ", a[i]), i++);
+        for (int i = 0; a[i] != EOF; i++)
+            printf("%d ", a[i]);
     printf("\n");
 }
 
 static inline int* get_options(int** a2d, int r, int c) {
-    if(a2d[r][c] != 0)
+    if (a2d[r][c] != 0)
         return NULL;
 
     int *cells = calloc(SIZE_SUDOKU + 1, sizeof (int));
@@ -39,6 +35,6 @@ static inline int* get_options(int** a2d, int r, int c) {
 
 int** open_sudoku(char* file);
 
-void reduce(int** a2d);
+int reduce(int** a2d);
 
 #endif //SUDOKU_C_SUDOKU_H
